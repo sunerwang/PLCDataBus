@@ -1,6 +1,6 @@
 #include "Tools.h"
 
-std::vector<std::string> Tools::splitString(const char* input) {
+std::vector<std::string> Tools::SplitString(const char* input) {
 	std::vector<std::string> result;
 	std::stringstream ss(input);
 	std::string token;
@@ -12,7 +12,8 @@ std::vector<std::string> Tools::splitString(const char* input) {
 	// profile文件中不能有空行，否则引起vector索引越界报错
 	return result;
 }
-std::vector<std::string> Tools::splitString(const std::string& str) {
+
+std::vector<std::string> Tools::SplitString(const std::string& str) {
 	std::vector<std::string> result;
 	std::regex pattern("([a-zA-Z]+)([0-9]+)(\\.[0-9]+)?(\\.[0-9]+)?");
 	std::smatch matches;
@@ -32,7 +33,8 @@ std::vector<std::string> Tools::splitString(const std::string& str) {
 
 	return result;
 }
-void Tools::printAllBits(unsigned char* buffer, size_t length) {
+
+void Tools::PrintAllBits(unsigned char* buffer, size_t length) {
 	for (size_t i = 0; i < length; ++i) {
 		for (int j = 0; j < 8; j++) {
 			std::cout << ((buffer[i] >> j) & 1);
@@ -41,7 +43,8 @@ void Tools::printAllBits(unsigned char* buffer, size_t length) {
 	}
 	std::cout << std::endl;
 }
-int Tools::compareBit(unsigned char c1, unsigned char c2) {
+
+int Tools::CompareBit(unsigned char c1, unsigned char c2) {
 	int result = 0;
 	for (; result < 8; ++result) {
 		// 逐位比较
@@ -54,7 +57,8 @@ int Tools::compareBit(unsigned char c1, unsigned char c2) {
 	}
 	return result;
 }
-bool Tools::compareByte(unsigned char* buffer1, unsigned char* buffer2, int size) {
+
+bool Tools::CompareByte(unsigned char* buffer1, unsigned char* buffer2, int size) {
 
 	for (int i = 0; i < size; ++i) {
 
@@ -73,7 +77,8 @@ bool Tools::compareByte(unsigned char* buffer1, unsigned char* buffer2, int size
 
 	return 1;
 }
-void Tools::preciseSleep(double nanoseconds) {
+
+void Tools::PreciseSleep(double nanoseconds) {
 	if (nanoseconds < 0) return;
 
 	LARGE_INTEGER frequency;        // 计时器频率
@@ -98,7 +103,8 @@ void Tools::preciseSleep(double nanoseconds) {
 
 	} while (elapsedTime < counts);
 }
-void Tools::checkForEscExit() {
+
+void Tools::CheckForEscExit() {
 	while (1) {
 	
 		if (_kbhit()) { // 检测是否有按键按下
@@ -110,3 +116,41 @@ void Tools::checkForEscExit() {
 		}
 	}
 }
+
+std::string Tools::BinaryConversionOther(unsigned char* buffer, VARENUM type, int offset) {
+	std::string re;
+	if (type == VARENUM::VT_BOOL) {
+		/*if (offset == -1) {
+			throw invalid_argument("BOOL type requires mini offset");
+		}*/
+		uint8_t byte = buffer[0];
+		bool bit = (byte >> offset) & 1;
+		re = std::to_string(bit);
+	}
+	else if (type == VARENUM::VT_I2) {
+		int16_t val = int(buffer[1]) + int(buffer[0]) * pow(2, 8);
+		re = std::to_string(val);
+	}
+	else if (type == VARENUM::VT_I4) {
+		int32_t val = static_cast<int32_t>(buffer[3]) + static_cast<int32_t>(buffer[2]) * 256 +
+			static_cast<int32_t>(buffer[1]) * 65536 + static_cast<int32_t>(buffer[0]) * 16777216;
+		re = std::to_string(val);
+	}
+	else if (type == VARENUM::VT_R4) {
+		uint32_t val = static_cast<uint32_t>(buffer[3]) + static_cast<uint32_t>(buffer[2]) * 256 +
+			static_cast<uint32_t>(buffer[1]) * 65536 + static_cast<uint32_t>(buffer[0]) * 16777216;
+		float fval = *reinterpret_cast<float*>(&val);
+		std::stringstream ss;
+		ss << std::fixed << std::setprecision(6) << fval;
+		re = ss.str();
+	}
+	else {
+		throw std::invalid_argument("Unsupported data type");
+	}
+	return re;
+}
+
+const int Tools::TypeSize_[32] = { 0,0,2,4,4,8,4,8,
+								  8,4,4,1,4,4,16,-1,
+								  1,1,2,4,8,8,4,4,
+								  0,2,4,4,4,4,8,16};

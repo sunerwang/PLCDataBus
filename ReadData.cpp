@@ -4,12 +4,12 @@
 int main() {
 
 	int ThreadNum = 3;
-	Init* init = Init::GetInstance();
-	init->InitTargetData();
 	ThreadPool pool(ThreadNum);
+	Init* init = new Init(); // 一份profile文件对应一个Init对象
 
-	pool.enqueue(&Init::ReadDataInform, init, std::ref(init->blocks), std::ref(init->dataInform));
-	pool.enqueue(&Tools::checkForEscExit);
+	pool.enqueue(&Init::Run, init, std::ref("testprofile.txt"));
+	pool.enqueue(&Tools::CheckForEscExit);
+	//pool.enqueue(&Init::InquireData, init);
 
 	return 0;
 }

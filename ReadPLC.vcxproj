@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\Project\P1\ReadPLC;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,15 +131,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="DataStructure.h" />
+    <ClInclude Include="DataBlock.h" />
+    <ClInclude Include="DataInform.h" />
     <ClInclude Include="Init.h" />
+    <ClInclude Include="PLCConnection.h" />
     <ClInclude Include="snap7.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Tools.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="DataStructure.cpp" />
+    <ClCompile Include="DataBlock.cpp" />
+    <ClCompile Include="DataInform.cpp" />
     <ClCompile Include="Init.cpp" />
+    <ClCompile Include="PLCConnection.cpp" />
     <ClCompile Include="ReadData.cpp" />
     <ClCompile Include="snap7.cpp" />
     <ClCompile Include="ThreadPool.cpp" />

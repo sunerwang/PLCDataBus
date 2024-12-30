@@ -1,5 +1,7 @@
-E:\Project\P1\ReadPLC\DataStructure.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\DataStructure.obj
+E:\Project\P1\ReadPLC\DataBlock.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\DataBlock.obj
+E:\Project\P1\ReadPLC\DataInform.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\DataInform.obj
 E:\Project\P1\ReadPLC\Init.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\Init.obj
+E:\Project\P1\ReadPLC\PLCConnection.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\PLCConnection.obj
 E:\Project\P1\ReadPLC\ReadData.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\ReadData.obj
 E:\Project\P1\ReadPLC\snap7.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\snap7.obj
 E:\Project\P1\ReadPLC\ThreadPool.cpp;E:\Project\P1\ReadPLC\ReadPLC\x64\Debug\ThreadPool.obj

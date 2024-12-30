@@ -18,16 +18,22 @@
     <ClInclude Include="snap7.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="DataStructure.h">
+    <ClInclude Include="DataInform.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ThreadPool.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Init.h">
+    <ClInclude Include="Tools.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Tools.h">
+    <ClInclude Include="PLCConnection.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DataBlock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Init.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,16 +44,22 @@
     <ClCompile Include="ReadData.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="DataStructure.cpp">
+    <ClCompile Include="DataInform.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Init.cpp">
+    <ClCompile Include="Tools.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Tools.cpp">
+    <ClCompile Include="PLCConnection.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DataBlock.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Init.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
