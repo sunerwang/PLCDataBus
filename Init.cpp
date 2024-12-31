@@ -1,5 +1,7 @@
 #include "Init.h"
 
+bool bExit = false;
+
 Init::Init() {}
 Init::~Init() {}
 
@@ -16,23 +18,26 @@ void Init::ReadProfile(std::string file) {
 	}
 
 	//适配不止连接1个PLC，需要进一步修改
+	//plc_.emplace_back(std::make_unique<PLCConnection>());
+	 plc_.emplace_back(std::make_unique<PLCConnection>());
+	//plc_[0].ConnectPLC();
 	int index = 0;
 	profile.getline(buffer, 256, '\n');
-	plc_[index].SetAddress(Tools::SplitString(buffer)[1]);
+	plc_[index]->SetAddress(Tools::SplitString(buffer)[1]);
 	profile.getline(buffer, 256, '\n');
-	plc_[index].SetRack(std::stoi(Tools::SplitString(buffer)[1]));
+	plc_[index]->SetRack(std::stoi(Tools::SplitString(buffer)[1]));
 	profile.getline(buffer, 256, '\n');
-	plc_[index].SetSolt(std::stoi(Tools::SplitString(buffer)[1]));
+	plc_[index]->SetSolt(std::stoi(Tools::SplitString(buffer)[1]));
 
 	while (!profile.eof()) {
 		profile.getline(buffer, 256, '\n');
 		result = Tools::SplitString(buffer);
-		plc_[index].dataInform_.emplace_back(DataInform(result[0], result[2], stringToArea[result[3]], stringToVARENUM[result[1]]));
+		plc_[index]->dataInform_.emplace_back(DataInform(result[0], result[2], stringToArea[result[3]], stringToVARENUM[result[1]]));
 	}
 	profile.close();
-	sort(plc_[index].dataInform_.begin(), plc_[index].dataInform_.end(), DataInform::Compare);
-	for (int i = 0; i < plc_[index].dataInform_.size();++i) {
-		plc_[index].tagsMap_[plc_[i].dataInform_[i].name_] = i;
+	sort(plc_[index]->dataInform_.begin(), plc_[index]->dataInform_.end(), DataInform::Compare);
+	for (int i = 0; i < plc_[index]->dataInform_.size();++i) {
+		plc_[index]->tagsMap_[plc_[index]->dataInform_[i].name_] = i;
 	}
 
 	index++;
@@ -146,9 +151,10 @@ void Init::Run(std::string file){
 	//InitBlocks();
 
 	for (auto& plc : plc_) {
-		plc.InitDataform();
-		plc.CreateBlocks();
-		plc.InitBlocks();
+		plc->ConnectPLC();
+		plc->InitDataform();
+		plc->CreateBlocks();
+		plc->InitBlocks();
 	}
 
 	FILETIME startFt, endFt;
@@ -161,9 +167,9 @@ void Init::Run(std::string file){
 		startUi.HighPart = startFt.dwHighDateTime;
 
 		for (auto& plc : plc_) {
-			plc.UpdateBlocksBuffer();
-			plc.TraverseDataforms();
-			plc.SwitchBuffer();
+			plc->UpdateBlocksBuffer();
+			plc->TraverseDataforms();
+			plc->SwitchBuffer();
 		}
 
 		GetSystemTimePreciseAsFileTime(&endFt);
@@ -173,6 +179,8 @@ void Init::Run(std::string file){
 		elapsedTime /= 10000.0; // 转为ms
 
 		Tools::PreciseSleep(20000000 - elapsedTime * 1000000);
+
+		if (bExit) break;
 	}
 }
 

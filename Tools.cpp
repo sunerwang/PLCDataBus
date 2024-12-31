@@ -1,5 +1,7 @@
 #include "Tools.h"
 
+extern bool bExit;
+
 std::vector<std::string> Tools::SplitString(const char* input) {
 	std::vector<std::string> result;
 	std::stringstream ss(input);
@@ -111,7 +113,10 @@ void Tools::CheckForEscExit() {
 			char key = _getch(); // 获取按下的键
 			if (key == 27) { // 27 是 Esc 键的 ASCII 码
 				//std::cout << "检测到 Esc 键，退出程序。" << std::endl;
-				exit(0); // 退出程序
+				//exit(0); // 退出程序
+				bExit = true;
+				Sleep(1000);
+				break;
 			}
 		}
 	}

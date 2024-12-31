@@ -17,7 +17,7 @@ PLCConnection::~PLCConnection() {
 }
 
 bool PLCConnection::ConnectPLC() {
-	myClient_->ConnectTo(address_.data(), rack_, solt_);
+	myClient_->ConnectTo(address_.c_str(), rack_, solt_);
 	return myClient_->Connected();
 }
 
