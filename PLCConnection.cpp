@@ -4,7 +4,7 @@ PLCConnection::PLCConnection()
 	:myClient_(new TS7Client), address_("127.0.0.1"), rack_(0), solt_(1) {}
 
 PLCConnection::PLCConnection(std::string address, int rack, int solt)
-	:myClient_(new TS7Client), address_(address), rack_(rack), solt_(solt){}
+	:myClient_(new TS7Client), address_(address), rack_(rack), solt_(solt) {}
 
 PLCConnection::~PLCConnection() {
 
@@ -78,5 +78,100 @@ void PLCConnection::DataRead(Area area, int dbNumber, int offset, int size, unsi
 	// 检查读取结果
 	if (result < 0) {
 		throw std::runtime_error("Failed to read data from PLC");
+	}
+}
+
+void PLCConnection::InitDataform() {
+	for (auto& entry : dataInform_) {
+		entry.value_ = ReadDataRegion(entry.address_, entry.area_, entry.type_, entry.size_);
+	}
+}
+
+void PLCConnection::CreateBlocks() {
+	int currentStart = -1;
+	DataBlock currentBlock;
+	std::vector<std::string> data;
+
+	for (auto& entry : dataInform_) {
+		data = Tools::SplitString(entry.address_);
+		int minioffset = -1;
+		if (data.size() == 4) minioffset = stoi(data[3]);
+		if (currentStart == -1) {
+			currentBlock.area_ = stringToArea[data[0]];
+			currentBlock.blockNum_ = stoi(data[1]);
+			currentBlock.startOffset_ = stoi(data[2]);
+			currentBlock.endOffset_ = entry.size_ + currentBlock.startOffset_;
+
+			entry.blockNum_ = blocks_.size();
+			entry.addInBlock_ = 0;
+			currentStart = 0;
+		}
+		else {
+			if (stringToArea[data[0]] != currentBlock.area_ || stoi(data[1]) != currentBlock.blockNum_) {
+				blocks_.emplace_back(currentBlock);
+				currentBlock.area_ = stringToArea[data[0]];
+				currentBlock.blockNum_ = stoi(data[1]);
+				currentBlock.startOffset_ = stoi(data[2]);
+				currentBlock.endOffset_ = entry.size_ + currentBlock.startOffset_;
+
+				entry.blockNum_ = blocks_.size();
+				entry.addInBlock_ = 0;
+			}
+			else {
+				if (stoi(data[2]) - currentBlock.startOffset_ + entry.size_ >= 210) {
+					blocks_.emplace_back(currentBlock);
+					currentBlock.area_ = stringToArea[data[0]];
+					currentBlock.blockNum_ = stoi(data[1]);
+					currentBlock.startOffset_ = stoi(data[2]);
+					currentBlock.endOffset_ = entry.size_ + currentBlock.startOffset_;
+
+					entry.blockNum_ = blocks_.size();
+					entry.addInBlock_ = 0;
+				}
+				else {
+					currentBlock.endOffset_ = stoi(data[2]) + entry.size_;
+					entry.blockNum_ = blocks_.size();
+					entry.addInBlock_ = stoi(data[2]) - currentBlock.startOffset_;
+				}
+			}
+		}
+	}
+	blocks_.emplace_back(currentBlock);
+	return;
+}
+
+void PLCConnection::InitBlocks() {
+	for (int i = 0; i < blocks_.size(); ++i) {
+		DataRead(blocks_[i].area_, blocks_[i].blockNum_, blocks_[i].startOffset_,
+			blocks_[i].endOffset_ - blocks_[i].startOffset_, blocks_[i].buffer_[1]);
+		DataRead(blocks_[i].area_, blocks_[i].blockNum_, blocks_[i].startOffset_,
+			blocks_[i].endOffset_ - blocks_[i].startOffset_, blocks_[i].buffer_[0]);
+	}
+}
+
+void PLCConnection::UpdateBlocksBuffer() {
+	for (int i = 0; i < blocks_.size(); ++i) {
+		DataRead(blocks_[i].area_, blocks_[i].blockNum_, blocks_[i].startOffset_,
+			blocks_[i].endOffset_ - blocks_[i].startOffset_, blocks_[i].buffer_[re]);
+	}
+}
+
+void PLCConnection::TraverseDataforms() {
+
+	for (auto& entry : dataInform_) {
+		if (entry.type_ == VARENUM::VT_BOOL &&
+			entry.GetMiniOffset(entry.address_) !=
+			Tools::CompareBit(blocks_[entry.blockNum_].buffer_[re][entry.addInBlock_],
+				blocks_[entry.blockNum_].buffer_[re ^ 1][entry.addInBlock_])) {
+			continue;
+		}
+		if (!Tools::CompareByte(blocks_[entry.blockNum_].buffer_[re] + entry.addInBlock_,
+			blocks_[entry.blockNum_].buffer_[re ^ 1] + entry.addInBlock_, entry.size_)) {
+			unsigned char tempBuffer[4];
+			memcpy(tempBuffer, blocks_[entry.blockNum_].buffer_[re] + entry.addInBlock_, 4);
+			entry.value_ =
+				Tools::BinaryConversionOther(tempBuffer, entry.type_, entry.GetMiniOffset(entry.address_));
+			std::cout << entry.name_ << "  " << entry.value_ << std::endl;
+		}
 	}
 }
