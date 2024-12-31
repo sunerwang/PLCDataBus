@@ -15,4 +15,7 @@ public:
 	int startOffset_;  // 初始偏移量
 	int endOffset_;  // 结束偏移量
 	unsigned char buffer_[2][MaxBufferLength]; // 缓存区
+
+private:
+	int re = 0;
 };

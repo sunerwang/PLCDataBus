@@ -2,6 +2,8 @@
 #include "snap7.h"
 #include <iostream>
 #include "Tools.h"
+#include "DataBlock.h"
+#include "DataInform.h"
 
 class PLCConnection {
 public:
@@ -27,4 +29,35 @@ private:
 	std::string address_; // PLC地址
 	int rack_;   // 导轨
 	int solt_;   // 槽号
+
+	//string--Area 映射表
+	std::map<std::string, Area> stringToArea = {
+		{"DB",Area::DB},
+		{"I",Area::I},
+		{"Q",Area::Q},
+		{"M",Area::M}
+	};
+
+	//string--VARENUM 映射表
+	std::map<std::string, VARENUM> stringToVARENUM = {
+		{"BOOL",VARENUM::VT_BOOL},
+		{"INT",VARENUM::VT_I2},
+		{"DINT",VARENUM::VT_I4},
+		{"REAL",VARENUM::VT_R4}
+	};
+
+	int re = 0;
+
+public:
+	std::vector<DataBlock> blocks_;			// 数据块划分
+	std::vector<DataInform> dataInform_;	// 数据点信息
+	std::map<std::string, int> tagsMap_;	// 数据名称--下标索引
+
+	void InitDataform(); // 初始化数据
+	void CreateBlocks(); // 创建数据块
+	void InitBlocks();	 // 初始化数据块
+	void UpdateBlocksBuffer();  // 更新数据缓冲区
+	void TraverseDataforms();   // 遍历数据点
+
+	void SwitchBuffer() { re = re ^ 1; }
 };
