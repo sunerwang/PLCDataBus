@@ -170,6 +170,7 @@ void Init::Run(std::string file){
 			plc->UpdateBlocksBuffer();
 			plc->TraverseDataforms();
 			plc->SwitchBuffer();
+			//std::cout << plc->blocks_.size() << std::endl;
 		}
 
 		GetSystemTimePreciseAsFileTime(&endFt);
@@ -177,6 +178,8 @@ void Init::Run(std::string file){
 		endUi.HighPart = endFt.dwHighDateTime;
 		elapsedTime = static_cast<double>(endUi.QuadPart - startUi.QuadPart);
 		elapsedTime /= 10000.0; // 转为ms
+
+		// std::cout << "单次耗时：" << elapsedTime << "ms" << std::endl;
 
 		Tools::PreciseSleep(20000000 - elapsedTime * 1000000);
 

@@ -20,7 +20,16 @@ public:
 		{"DB",Area::DB},
 		{"I",Area::I},
 		{"Q",Area::Q},
-		{"M",Area::M}
+		{"M",Area::M},
+		{"IB",Area::IB},
+		{"QB",Area::QB},
+		{"MB",Area::MB},
+		{"IW",Area::IW},
+		{"QW",Area::QW},
+		{"MW",Area::MW},
+		{"ID",Area::ID},
+		{"QD",Area::QD},
+		{"MD",Area::MD},
 	};
 
 	//string--VARENUM ”≥…‰±Ì

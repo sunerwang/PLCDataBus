@@ -21,6 +21,7 @@ int DataInform::GetOffset(std::string address){
 int DataInform::GetMiniOffset(std::string address){
 	std::vector<std::string> result = Tools::SplitString(address);
 	if (result.size() == 4) return std::stoi(result[3]);
+	//else if(result[0] == "M") return std::stoi(result[2]);
 	else return -1;
 }
 

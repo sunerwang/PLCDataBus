@@ -43,16 +43,23 @@ void PLCConnection::SetSolt(int solt) {
 }
 
 std::string PLCConnection::ReadDataRegion(std::string address, Area area, VARENUM type, int size) {
-	int result, MiniOffset = -1;
+	int result, offset = -1,MiniOffset = -1;
 	unsigned char buffer[4];
 	// 解析地址
 	std::vector<std::string> parseAdd = Tools::SplitString(address);
 
 	int dbNumber = stoi(parseAdd[1]); // DB块号
-	int offset = stoi(parseAdd[2]);  // 偏移量
+	if(parseAdd.size() >= 3) offset = stoi(parseAdd[2]);  // 偏移量
 	if (type == VARENUM::VT_BOOL && area == Area::DB) MiniOffset = stoi(parseAdd[3]); // 字节中偏移量
 
+	if (area != Area::DB) {
+		MiniOffset = offset;
+		offset = dbNumber;
+		dbNumber = 0;
+	}
+
 	DataRead(area, dbNumber, offset, size, buffer);
+	//Tools::PrintAllBits(buffer, 1);
 	// 解析buffer中的数据
 	return Tools::BinaryConversionOther(buffer, type, MiniOffset);
 }
@@ -63,18 +70,21 @@ void PLCConnection::DataRead(Area area, int dbNumber, int offset, int size, unsi
 	if (area == Area::DB) {
 		result = myClient_->DBRead(dbNumber, offset, size, buffer);
 	}
-	else if (area == Area::M) {
-		result = myClient_->ReadArea(S7AreaMK, dbNumber, offset, size, 1, buffer);
+	else {
+		result = myClient_->ReadArea(Tools::getS7Area(area), dbNumber, offset, size, Tools::getS7WL(area), buffer);
+	}
+	/*else if (area == Area::M) {
+		result = myClient_->ReadArea(S7AreaMK, dbNumber, offset, size, S7WLByte, buffer);
 	}
 	else if (area == Area::Q) {
-		result = myClient_->ReadArea(S7AreaPA, dbNumber, offset, size, 1, buffer);
+		result = myClient_->ReadArea(S7AreaPA, dbNumber, offset, size, S7WLByte, buffer);
 	}
 	else if (area == Area::I) {
-		result = myClient_->ReadArea(S7AreaPE, dbNumber, offset, size, 1, buffer);
+		result = myClient_->ReadArea(S7AreaPE, dbNumber, offset, size, 4, buffer);
 	}
 	else {
 		throw std::invalid_argument("Invalid area specified");
-	}
+	}*/
 	// 检查读取结果
 	if (result < 0) {
 		throw std::runtime_error("Failed to read data from PLC");

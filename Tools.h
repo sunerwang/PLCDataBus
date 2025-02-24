@@ -9,12 +9,22 @@
 #include <fstream>
 #include <windows.h>
 #include <conio.h>
+#include "snap7.h"
 
 enum class Area {
 	DB,
 	M,
+	MB,
+	MW,
+	MD,
 	I,
-	Q
+	IB,
+	IW,
+	ID,
+	Q,
+	QB,
+	QW,
+	QD
 };
 
 /*已包含在windows.h中*/
@@ -84,4 +94,7 @@ public:
 	static void CheckForEscExit();  // 按键退出
 	static std::string BinaryConversionOther(unsigned char* buffer, VARENUM type, int offset);  // 二进制转换
 	static const int TypeSize_[32];  // 变量类型大小
+	static int getS7Area(Area area);
+	static int getS7WL(Area area);
+
 };

@@ -159,3 +159,42 @@ const int Tools::TypeSize_[32] = { 0,0,2,4,4,8,4,8,
 								  8,4,4,1,4,4,16,-1,
 								  1,1,2,4,8,8,4,4,
 								  0,2,4,4,4,4,8,16};
+
+
+int Tools::getS7Area(Area area) {
+	switch (area) {
+		case Area::DB: return S7AreaDB;
+		case Area::M:  return S7AreaMK;
+		case Area::MB: return S7AreaMK;
+		case Area::MW: return S7AreaMK;
+		case Area::MD: return S7AreaMK;
+		case Area::I:  return S7AreaPE;
+		case Area::IB: return S7AreaPE;
+		case Area::IW: return S7AreaPE;
+		case Area::ID: return S7AreaPE;
+		case Area::Q:  return S7AreaPA;
+		case Area::QB: return S7AreaPA;
+		case Area::QW: return S7AreaPA;
+		case Area::QD: return S7AreaPA;
+		default: return -1;
+		}
+	}
+
+int Tools::getS7WL(Area area) {
+	switch (area) {
+		case Area::DB: return S7WLByte;
+		case Area::M:  return S7WLByte;
+		case Area::MB: return S7WLByte;
+		case Area::MW: return S7WLWord;
+		case Area::MD: return S7WLDWord;
+		case Area::I:  return S7WLByte;
+		case Area::IB: return S7WLByte;
+		case Area::IW: return S7WLWord;
+		case Area::ID: return S7WLDWord;
+		case Area::Q:  return S7WLByte;
+		case Area::QB: return S7WLByte;
+		case Area::QW: return S7WLWord;
+		case Area::QD: return S7WLDWord;
+		default: return -1;
+		}
+	}
