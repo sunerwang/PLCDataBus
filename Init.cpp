@@ -32,12 +32,12 @@ void Init::ReadProfile(std::string file) {
 	while (!profile.eof()) {
 		profile.getline(buffer, 256, '\n');
 		result = Tools::SplitString(buffer);
-		plc_[index]->dataInform_.emplace_back(DataInform(result[0], result[2], stringToArea[result[3]], stringToVARENUM[result[1]]));
+		plc_[index]->tagInform_.emplace_back(DataInform(result[0], result[2], stringToArea[result[3]], stringToVARENUM[result[1]]));
 	}
 	profile.close();
-	sort(plc_[index]->dataInform_.begin(), plc_[index]->dataInform_.end(), DataInform::Compare);
-	for (int i = 0; i < plc_[index]->dataInform_.size();++i) {
-		plc_[index]->tagsMap_[plc_[index]->dataInform_[i].name_] = i;
+	sort(plc_[index]->tagInform_.begin(), plc_[index]->tagInform_.end(), DataInform::Compare);
+	for (int i = 0; i < plc_[index]->tagInform_.size();++i) {
+		plc_[index]->tagIndex_[plc_[index]->tagInform_[i].name_] = i;
 	}
 
 	index++;

@@ -5,8 +5,10 @@ extern bool bExit;
 
 int main() {
 
-	PLCConnection plc = PLCConnection("140.32.1.141",0,1);
+	PLCConnection plc = PLCConnection("140.32.1.147",0,1);
 	bool i = plc.ConnectPLC();
+	std::cout << i << std::endl;
+	return 0;
 	int test;
 	//int clock_2Hz, clock_1Hz, clock_0_5Hz;
 	//std::ofstream jsonFile("data.json");

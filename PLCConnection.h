@@ -59,8 +59,8 @@ private:
 
 public:
 	std::vector<DataBlock> blocks_;			// 数据块划分
-	std::vector<DataInform> dataInform_;	// 数据点信息
-	std::map<std::string, int> tagsMap_;	// 数据名称--下标索引
+	std::vector<DataInform> tagInform_;	// 数据点信息
+	std::map<std::string, int> tagIndex_;	// 数据名称--下标索引
 
 	void InitDataform(); // 初始化数据
 	void CreateBlocks(); // 创建数据块
