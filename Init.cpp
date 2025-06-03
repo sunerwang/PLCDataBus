@@ -7,10 +7,10 @@ Init::~Init() {}
 
 void Init::ReadProfile(std::string file) {
 	std::ifstream profile;
-	profile.open(file, std::ios::in);
 	char buffer[256];
 	std::vector<std::string> result;
 
+	profile.open(file, std::ios::in);
 	if (!profile) {
 		// 检查文件是否成功打开
 		std::cerr << "Unable to open file";
@@ -18,25 +18,27 @@ void Init::ReadProfile(std::string file) {
 	}
 
 	//适配不止连接1个PLC，需要进一步修改
-	//plc_.emplace_back(std::make_unique<PLCConnection>());
-	 plc_.emplace_back(std::make_unique<PLCConnection>());
-	//plc_[0].ConnectPLC();
+	plc_.emplace_back(std::make_unique<PLCConnection>());
+
 	int index = 0;
+	//读取PLC地址、机架号、槽号信息
 	profile.getline(buffer, 256, '\n');
-	plc_[index]->SetAddress(Tools::SplitString(buffer)[1]);
+	plc_[index]->SetAddress(Tools::SplitString(buffer,',')[1]);
 	profile.getline(buffer, 256, '\n');
-	plc_[index]->SetRack(std::stoi(Tools::SplitString(buffer)[1]));
+	plc_[index]->SetRack(std::stoi(Tools::SplitString(buffer, ',')[1]));
 	profile.getline(buffer, 256, '\n');
-	plc_[index]->SetSolt(std::stoi(Tools::SplitString(buffer)[1]));
+	plc_[index]->SetSolt(std::stoi(Tools::SplitString(buffer, ',')[1]));
 
 	while (!profile.eof()) {
 		profile.getline(buffer, 256, '\n');
-		result = Tools::SplitString(buffer);
+		if (buffer[0] == '\0') continue; // 跳过空行
+		result = Tools::SplitString(buffer, ',');	// 分割字符串, result[0]为名称，result[1]为数据类型，result[2]为地址，result[3]为数据块区域类型
 		plc_[index]->tagInform_.emplace_back(DataInform(result[0], result[2], stringToArea[result[3]], stringToVARENUM[result[1]]));
 	}
 	profile.close();
+
 	sort(plc_[index]->tagInform_.begin(), plc_[index]->tagInform_.end(), DataInform::Compare);
-	for (int i = 0; i < plc_[index]->tagInform_.size();++i) {
+	for (int i = 0; i < plc_[index]->tagInform_.size(); ++i) {
 		plc_[index]->tagIndex_[plc_[index]->tagInform_[i].name_] = i;
 	}
 
@@ -138,22 +140,19 @@ void Init::ReadProfile(std::string file) {
 //	}
 //}
 
-void Init::Run(std::string file){
-
-	//int re = 0;
-
+void Init::Run(std::string file) {
 	//创建所有的PLC对象
 	ReadProfile(file);
 
-	//plc_.ConnectPLC();
-	//InitDataform();
-	//CreateBlocks();
-	//InitBlocks();
+	for (auto& plc : plc_) {
+		plc->CreateBlocks();
+	}
 
 	for (auto& plc : plc_) {
 		plc->ConnectPLC();
-		plc->InitDataform();
-		plc->CreateBlocks();
+		//mark 为何在这里把所有的tag点读一遍，应该是为了初始化数据，给所有的tag点赋初值
+		plc->TriggerFirstRead();
+		//plc->CreateBlocks();
 		plc->InitBlocks();
 	}
 

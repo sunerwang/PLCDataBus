@@ -46,7 +46,7 @@ std::string PLCConnection::ReadDataRegion(std::string address, Area area, VARENU
 	int result, offset = -1,MiniOffset = -1;
 	unsigned char buffer[4];
 	// ½âÎöµØÖ·
-	std::vector<std::string> parseAdd = Tools::SplitString(address);
+	std::vector<std::string> parseAdd = Tools::SplitAddressString(address);
 
 	int dbNumber = stoi(parseAdd[1]); // DB¿éºÅ
 	if(parseAdd.size() >= 3) offset = stoi(parseAdd[2]);  // Æ«ÒÆÁ¿
@@ -101,22 +101,22 @@ void PLCConnection::DataRead(Area area, int dbNumber, int offset, int size, unsi
 	}
 }
 
-void PLCConnection::InitDataform() {
+void PLCConnection::TriggerFirstRead() {
 	for (auto& entry : tagInform_) {
 		entry.value_ = ReadDataRegion(entry.address_, entry.area_, entry.type_, entry.size_);
 	}
 }
 
 void PLCConnection::CreateBlocks() {
-	int currentStart = -1;
+	int firstLoop = -1;
 	DataBlock currentBlock;
 	std::vector<std::string> splitstr;
 
 	for (auto& tag : tagInform_) {
-		splitstr = Tools::SplitString(tag.address_);
+		splitstr = Tools::SplitAddressString(tag.address_);
 		int minioffset = -1;
 		if (splitstr.size() == 4) minioffset = stoi(splitstr[3]);
-		if (currentStart == -1) {
+		if (firstLoop == -1) {
 			currentBlock.area_ = stringToArea[splitstr[0]];
 			currentBlock.blockNum_ = stoi(splitstr[1]);
 			currentBlock.startOffset_ = stoi(splitstr[2]);
@@ -124,7 +124,7 @@ void PLCConnection::CreateBlocks() {
 
 			tag.blockNum_ = blocks_.size();
 			tag.addInBlock_ = 0;
-			currentStart = 0;
+			firstLoop = 0;
 		}
 		else {
 			if (stringToArea[splitstr[0]] != currentBlock.area_ || stoi(splitstr[1]) != currentBlock.blockNum_) {
@@ -143,7 +143,7 @@ void PLCConnection::CreateBlocks() {
 					currentBlock.area_ = stringToArea[splitstr[0]];
 					currentBlock.blockNum_ = stoi(splitstr[1]);
 					currentBlock.startOffset_ = stoi(splitstr[2]);
-					currentBlock.endOffset_ = tag.size_ + currentBlock.startOffset_;
+					currentBlock.endOffset_ = 
 
 					tag.blockNum_ = blocks_.size();
 					tag.addInBlock_ = 0;

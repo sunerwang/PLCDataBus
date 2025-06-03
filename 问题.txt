@@ -1,0 +1,12 @@
+读的时候是否包含endOffset_？
+void PLCConnection::InitBlocks() {
+	for (int i = 0; i < blocks_.size(); ++i) {
+		DataRead(blocks_[i].area_, blocks_[i].blockNum_, blocks_[i].startOffset_,
+			blocks_[i].endOffset_ - blocks_[i].startOffset_, blocks_[i].buffer_[1]);
+		DataRead(blocks_[i].area_, blocks_[i].blockNum_, blocks_[i].startOffset_,
+			blocks_[i].endOffset_ - blocks_[i].startOffset_, blocks_[i].buffer_[0]);
+	}
+}
+从上面看应该是不包含
+
+是否考虑了PLC断开后重连的情况
