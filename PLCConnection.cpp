@@ -46,7 +46,7 @@ std::string PLCConnection::ReadDataRegion(std::string address, Area area, VARENU
 	int result, offset = -1,MiniOffset = -1;
 	unsigned char buffer[4];
 	// 解析地址
-	std::vector<std::string> parseAdd = Tools::SplitString(address);
+	std::vector<std::string> parseAdd = Tools::SplitAddressString(address);
 
 	int dbNumber = stoi(parseAdd[1]); // DB块号
 	if(parseAdd.size() >= 3) offset = stoi(parseAdd[2]);  // 偏移量
@@ -69,9 +69,19 @@ void PLCConnection::DataRead(Area area, int dbNumber, int offset, int size, unsi
 	// 根据area选择不同的读取区域
 	if (area == Area::DB) {
 		result = myClient_->DBRead(dbNumber, offset, size, buffer);
+
+		//int TS7Client::DBRead(int DBNumber, int Start, int Size, void* pUsrData)
+		//{
+		//	return Cli_DBRead(Client, DBNumber, Start, Size, pUsrData);
+		//}
 	}
 	else {
 		result = myClient_->ReadArea(Tools::getS7Area(area), dbNumber, offset, size, Tools::getS7WL(area), buffer);
+
+		//int TS7Client::ReadArea(int Area, int DBNumber, int Start, int Amount, int WordLen, void* pUsrData)
+		//{
+		//	return Cli_ReadArea(Client, Area, DBNumber, Start, Amount, WordLen, pUsrData);
+		//}
 	}
 	/*else if (area == Area::M) {
 		result = myClient_->ReadArea(S7AreaMK, dbNumber, offset, size, S7WLByte, buffer);
@@ -91,57 +101,57 @@ void PLCConnection::DataRead(Area area, int dbNumber, int offset, int size, unsi
 	}
 }
 
-void PLCConnection::InitDataform() {
-	for (auto& entry : dataInform_) {
+void PLCConnection::TriggerFirstRead() {
+	for (auto& entry : tagInform_) {
 		entry.value_ = ReadDataRegion(entry.address_, entry.area_, entry.type_, entry.size_);
 	}
 }
 
 void PLCConnection::CreateBlocks() {
-	int currentStart = -1;
+	int firstLoop = -1;
 	DataBlock currentBlock;
-	std::vector<std::string> data;
+	std::vector<std::string> splitstr;
 
-	for (auto& entry : dataInform_) {
-		data = Tools::SplitString(entry.address_);
+	for (auto& tag : tagInform_) {
+		splitstr = Tools::SplitAddressString(tag.address_);
 		int minioffset = -1;
-		if (data.size() == 4) minioffset = stoi(data[3]);
-		if (currentStart == -1) {
-			currentBlock.area_ = stringToArea[data[0]];
-			currentBlock.blockNum_ = stoi(data[1]);
-			currentBlock.startOffset_ = stoi(data[2]);
-			currentBlock.endOffset_ = entry.size_ + currentBlock.startOffset_;
+		if (splitstr.size() == 4) minioffset = stoi(splitstr[3]);
+		if (firstLoop == -1) {
+			currentBlock.area_ = stringToArea[splitstr[0]];
+			currentBlock.blockNum_ = stoi(splitstr[1]);
+			currentBlock.startOffset_ = stoi(splitstr[2]);
+			currentBlock.endOffset_ = tag.size_ + currentBlock.startOffset_;
 
-			entry.blockNum_ = blocks_.size();
-			entry.addInBlock_ = 0;
-			currentStart = 0;
+			tag.blockNum_ = blocks_.size();
+			tag.addInBlock_ = 0;
+			firstLoop = 0;
 		}
 		else {
-			if (stringToArea[data[0]] != currentBlock.area_ || stoi(data[1]) != currentBlock.blockNum_) {
+			if (stringToArea[splitstr[0]] != currentBlock.area_ || stoi(splitstr[1]) != currentBlock.blockNum_) {
 				blocks_.emplace_back(currentBlock);
-				currentBlock.area_ = stringToArea[data[0]];
-				currentBlock.blockNum_ = stoi(data[1]);
-				currentBlock.startOffset_ = stoi(data[2]);
-				currentBlock.endOffset_ = entry.size_ + currentBlock.startOffset_;
+				currentBlock.area_ = stringToArea[splitstr[0]];
+				currentBlock.blockNum_ = stoi(splitstr[1]);
+				currentBlock.startOffset_ = stoi(splitstr[2]);
+				currentBlock.endOffset_ = tag.size_ + currentBlock.startOffset_;
 
-				entry.blockNum_ = blocks_.size();
-				entry.addInBlock_ = 0;
+				tag.blockNum_ = blocks_.size();
+				tag.addInBlock_ = 0;
 			}
 			else {
-				if (stoi(data[2]) - currentBlock.startOffset_ + entry.size_ >= 210) {
+				if (stoi(splitstr[2]) - currentBlock.startOffset_ + tag.size_ >= 210) {
 					blocks_.emplace_back(currentBlock);
-					currentBlock.area_ = stringToArea[data[0]];
-					currentBlock.blockNum_ = stoi(data[1]);
-					currentBlock.startOffset_ = stoi(data[2]);
-					currentBlock.endOffset_ = entry.size_ + currentBlock.startOffset_;
+					currentBlock.area_ = stringToArea[splitstr[0]];
+					currentBlock.blockNum_ = stoi(splitstr[1]);
+					currentBlock.startOffset_ = stoi(splitstr[2]);
+					currentBlock.endOffset_ = 
 
-					entry.blockNum_ = blocks_.size();
-					entry.addInBlock_ = 0;
+					tag.blockNum_ = blocks_.size();
+					tag.addInBlock_ = 0;
 				}
 				else {
-					currentBlock.endOffset_ = stoi(data[2]) + entry.size_;
-					entry.blockNum_ = blocks_.size();
-					entry.addInBlock_ = stoi(data[2]) - currentBlock.startOffset_;
+					currentBlock.endOffset_ = stoi(splitstr[2]) + tag.size_;
+					tag.blockNum_ = blocks_.size();
+					tag.addInBlock_ = stoi(splitstr[2]) - currentBlock.startOffset_;
 				}
 			}
 		}
@@ -168,7 +178,7 @@ void PLCConnection::UpdateBlocksBuffer() {
 
 void PLCConnection::TraverseDataforms() {
 
-	for (auto& entry : dataInform_) {
+	for (auto& entry : tagInform_) {
 		if (entry.type_ == VARENUM::VT_BOOL &&
 			entry.GetMiniOffset(entry.address_) !=
 			Tools::CompareBit(blocks_[entry.blockNum_].buffer_[re][entry.addInBlock_],

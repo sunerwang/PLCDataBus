@@ -59,10 +59,12 @@ private:
 
 public:
 	std::vector<DataBlock> blocks_;			// 数据块划分
-	std::vector<DataInform> dataInform_;	// 数据点信息
-	std::map<std::string, int> tagsMap_;	// 数据名称--下标索引
+	std::vector<DataInform> tagInform_;		// TAG信息
 
-	void InitDataform(); // 初始化数据
+	//mark TAG信息应保存为全局，否则当写PLC时如何知道此TAG是在哪个PLC里
+	std::unordered_map<std::string, int> tagIndex_;	// TAG名称--下标索引
+
+	void TriggerFirstRead(); // 初始化数据
 	void CreateBlocks(); // 创建数据块
 	void InitBlocks();	 // 初始化数据块
 	void UpdateBlocksBuffer();  // 更新数据缓冲区

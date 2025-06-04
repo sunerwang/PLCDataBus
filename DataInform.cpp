@@ -15,31 +15,37 @@ int DataInform::GetSize(VARENUM type) {
 }
 
 int DataInform::GetOffset(std::string address){
-	return std::stoi(Tools::SplitString(address)[2]);
+	return std::stoi(Tools::SplitAddressString(address)[2]);
 }
 
 int DataInform::GetMiniOffset(std::string address){
-	std::vector<std::string> result = Tools::SplitString(address);
+	std::vector<std::string> result = Tools::SplitAddressString(address);
 	if (result.size() == 4) return std::stoi(result[3]);
 	//else if(result[0] == "M") return std::stoi(result[2]);
 	else return -1;
 }
 
+//mark 待优化
 bool DataInform::Compare(const DataInform& a, const DataInform& b) {
-	std::vector<std::string> resultA = Tools::SplitString(a.address_);
-	std::vector<std::string> resultB = Tools::SplitString(b.address_);
+	std::vector<std::string> resultA = Tools::SplitAddressString(a.address_);
+	std::vector<std::string> resultB = Tools::SplitAddressString(b.address_);
 
 	if (resultA[0] == resultB[0]) {
 		if (resultA[1] == resultB[1]) {
 			if (resultA[2] == resultB[2]) {
 				return std::stoi(resultA[3]) < std::stoi(resultB[3]);
 			}
-			else return std::stoi(resultA[2]) < std::stoi(resultB[2]);
+			else {
+				return std::stoi(resultA[2]) < std::stoi(resultB[2]);
+			}
 		}
-		else return std::stoi(resultA[1]) < std::stoi(resultB[1]);
+		else {
+			return std::stoi(resultA[1]) < std::stoi(resultB[1]);
+		}
 	}
-	else return resultA[0] < resultB[0];
-
+	else {
+		return resultA[0] < resultB[0];
+	}
 }
 
 // 赋值操作符

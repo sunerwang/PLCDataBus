@@ -11,8 +11,8 @@ public:
     std::string address_;
     Area area_;
     VARENUM type_;
-    int size_;
 
+    int size_;
     int blockNum_;
     int addInBlock_;
      

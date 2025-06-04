@@ -5,8 +5,12 @@ extern bool bExit;
 
 int main() {
 
-	PLCConnection plc = PLCConnection("140.32.1.141",0,1);
-	bool i = plc.ConnectPLC();
+	//PLCConnection plc = PLCConnection("140.32.1.147",0,1);
+	//bool i = plc.ConnectPLC();
+	//std::cout << i << std::endl;
+	//return 0;
+
+
 	int test;
 	//int clock_2Hz, clock_1Hz, clock_0_5Hz;
 	//std::ofstream jsonFile("data.json");
@@ -18,7 +22,7 @@ int main() {
 	//jsonFile.close();
 	//std::vector<std::map<std::string, int>> dataPoints;
 
-	while (1) {
+	//while (1) {
 	//	clock_2Hz = std::stoi(plc.ReadDataRegion("M10.3", Area::M, VARENUM::VT_BOOL, 1));
 	//	clock_1Hz = std::stoi(plc.ReadDataRegion("M10.5", Area::M, VARENUM::VT_BOOL, 1));
 	//	clock_0_5Hz = std::stoi(plc.ReadDataRegion("M10.7", Area::M, VARENUM::VT_BOOL, 1));
@@ -40,11 +44,11 @@ int main() {
 	//	outFile << "]";
 	//	outFile.close();
 
-		test = std::stoi(plc.ReadDataRegion("MW6", Area::MW, VARENUM::VT_I2, 1));
-		std::cout << test << std::endl;
-		Tools::PreciseSleep(500000000);
-	
-	}
+	//	test = std::stoi(plc.ReadDataRegion("MW6", Area::MW, VARENUM::VT_I2, 1));
+	//	std::cout << test << std::endl;
+	//	Tools::PreciseSleep(500000000);
+	//
+	//}
 	//std::cout << i << std::endl;
 	//return 0;
 	int ThreadNum = 3;

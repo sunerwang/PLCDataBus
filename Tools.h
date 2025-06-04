@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <sstream>
 #include <regex>
@@ -85,8 +86,9 @@ enum class Area {
 
 class Tools {
 public:
-	static std::vector<std::string> SplitString(const char* input);     // 分割字符串
-	static std::vector<std::string> SplitString(const std::string& str);
+	static std::vector<std::string> SplitString(const char* input, char splitchar);
+	// 分割字符串
+	static std::vector<std::string> SplitAddressString(const std::string& str);
 	static void PrintAllBits(unsigned char* buffer, size_t length);   // 打印所有bit
 	static int CompareBit(unsigned char c1, unsigned char c2);  // 逐位对比并返回不同的位下标
 	static bool CompareByte(unsigned char* buffer1, unsigned char* buffer2, int size); // 判断是否相同

@@ -2,20 +2,20 @@
 
 extern bool bExit;
 
-std::vector<std::string> Tools::SplitString(const char* input) {
+std::vector<std::string> Tools::SplitString(const char* input, char splitchar) {
 	std::vector<std::string> result;
 	std::stringstream ss(input);
 	std::string token;
 
-	// 按逗号分割字符串
-	while (getline(ss, token, ',')) {
+	// 分割字符串
+	while (getline(ss, token, splitchar)) {
 		result.push_back(token);
 	}
 	// profile文件中不能有空行，否则引起vector索引越界报错
 	return result;
 }
 
-std::vector<std::string> Tools::SplitString(const std::string& str) {
+std::vector<std::string> Tools::SplitAddressString(const std::string& str) {
 	std::vector<std::string> result;
 	std::regex pattern("([a-zA-Z]+)([0-9]+)(\\.[0-9]+)?(\\.[0-9]+)?");
 	std::smatch matches;
